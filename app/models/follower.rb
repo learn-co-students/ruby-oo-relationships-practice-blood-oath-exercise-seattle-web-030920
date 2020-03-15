@@ -20,11 +20,22 @@ class Follower
     end
 
     def join_cult(cult)
-        BloodOath.new(cult, self)
+        if @age >= cult.minimum_age
+            BloodOath.new(cult, self)
+        else
+            puts "Sorry, you are too young to join this cult."
+        end
     end
 
     def my_cults_slogans
         self.cults.map {|cult| cult.slogan}
+    end
+
+    def fellow_cult_members
+        same_cult_oaths = self.cults.map do |cult|
+            BloodOath.all.select {|oath| oath.cult == cult}
+        end
+        same_cult_oaths.flatten.map {|oath| oath.follower}.uniq - [self]
     end
 
     def self.all
