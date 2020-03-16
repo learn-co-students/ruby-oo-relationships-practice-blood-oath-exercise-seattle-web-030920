@@ -3,21 +3,26 @@ require 'pry'
 
 class Cult
     attr_accessor :name, :location, :slogan
-    attr_accessor :founding_year
+    attr_reader :founding_year, :minimum_age
 
     @@all = []
 
-    def initialize(name:, slogan:, location:)
+    def initialize(name:, slogan:, location:, minimum_age: 21)
         @name = name                
         @slogan = slogan
         @founding_year = Date.today.year
         @location = location
+        @minimum_age = minimum_age
         @@all << self
     end
 
     def recruit_follower(follower)
         #add to list of cult followers
-        BloodOath.new(cult: self, follower: follower)    
+        if(follower.age >= self.minimum_age)
+            BloodOath.new(cult: self, follower: follower)    
+        else
+            puts "Follower #{follower.name} is too young at #{follower.age}.  Cult \"#{self.name}\" requires its users to be older than #{self.minimum_age} to be recruited.  Try a McDonald's ball pit."
+        end
     end
 
     def cult_population
@@ -36,6 +41,10 @@ class Cult
 
     def my_followers_mottos
         self.followers.map{|follower| follower.life_motto}        
+    end    
+
+    def minimum_age=(minimum_age)
+        @minimum_age = minimum_age
     end
 
     def self.all
@@ -64,8 +73,8 @@ class Cult
     def self.most_common_location
         #returns a String that is the location with the most cults
         locations_with_count = self.all.map{|cult| cult.location}.uniq.map{|cur_location| {locationKey: cur_location, countKey: self.all.select{|cur_cult| cur_cult.location == cur_location}.length }}         
-        location_with_max_occurance = locations_with_count.max{|curr_item, next_item| curr_item[:countKey] <=> next_item[:countKey]}        
-        items_with_max_value = locations_with_count.select{|location_to_count| location_to_count[:countKey] == location_with_max_occurance[:countKey]}        
-        items_with_max_value.reduce{|result, next_item| result = "#{result[:locationKey]}, #{next_item[:locationKey]}"}        
+        found_location_with_max_occurance = locations_with_count.max{|curr_item, next_item| curr_item[:countKey] <=> next_item[:countKey]}        
+        locations_with_max_occurance = locations_with_count.select{|location_to_count| location_to_count[:countKey] == found_location_with_max_occurance[:countKey]}           
+        locations_with_max_occurance = locations_with_max_occurance.map{|location_to_count| location_to_count[:locationKey]}.reduce{|result, next_iter| result = "#{result}, #{next_iter}"}                
     end
 end

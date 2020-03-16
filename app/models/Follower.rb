@@ -16,12 +16,20 @@ class Follower
     end
     
     def join_cult(cult_name)
-        #takes in an argument of a Cult instance and adds this follower to the cult's list of followers
-        BloodOath.new(cult: cult_name, follower: self)
+        #takes in an argument of a Cult instance and adds this follower to the cult's list of followers        
+        if(self.age >= cult_name.minimum_age)
+            BloodOath.new(cult: cult_name, follower: self)
+        else                        
+            puts "Cult \"#{cult_name.name}\" minimum age is #{cult_name.minimum_age}.  Follower #{self.name} is only #{self.age}.  You got #{cult_name.minimum_age - self.age} years before you can rock it out like a champ!"            
+        end        
     end
 
     def my_cults_slogans
         self.cults.map{|cult| cult.slogan}
+    end
+
+    def fellow_cult_members        
+        self.cults.map{|curr_cult| BloodOath.all.select{|blood_oath_curr| blood_oath_curr.cult == curr_cult}.map{|blood_oath_curr| blood_oath_curr.follower}}.flatten                
     end
 
     def self.all
