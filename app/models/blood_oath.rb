@@ -1,3 +1,5 @@
+require 'time'
+
 class BloodOath
   attr_accessor :initiation_date, :follower, :cult
 
